@@ -7,18 +7,17 @@ ENV NPM_CONFIG_CACHE /root/.npm
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-11.0.23.0.9-2.el7_9.x86_64
 ENV PATH $JAVA_HOME/bin:$PATH
 
-# Add the AdoptOpenJDK repository and install Java 11
+# Install required packages and Java 11
 USER root
 RUN apt-get update && \
-    apt-get install -y wget gnupg && \
+    apt-get install -y wget gnupg curl && \
     wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add - && \
     echo "deb https://packages.adoptium.net/artifactory/deb focal main" > /etc/apt/sources.list.d/adoptium.list && \
     apt-get update && \
-    apt-get install -y temurin-11-jdk curl
+    apt-get install -y temurin-11-jdk
 
 # Install nvm and Node.js
-RUN mkdir -p $NVM_DIR && \
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash && \
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash && \
     . $NVM_DIR/nvm.sh && \
     nvm install 18.17.0 && \
     nvm use 18.17.0 && \
@@ -30,10 +29,6 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Ensure the correct permissions for package files
-RUN chown -R root:root /usr/src/app $NVM_DIR $NPM_CONFIG_CACHE && \
-    chmod -R 777 /usr/src/app $NVM_DIR $NPM_CONFIG_CACHE
-
 # Install any needed packages
 RUN npm install
 
@@ -41,7 +36,8 @@ RUN npm install
 COPY . .
 
 # Ensure the correct permissions for all files
-RUN chown -R root:root /usr/src/app && chmod -R 777 /usr/src/app
+RUN chown -R root:root /usr/src/app $NVM_DIR $NPM_CONFIG_CACHE && \
+    chmod -R 777 /usr/src/app $NVM_DIR $NPM_CONFIG_CACHE
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
