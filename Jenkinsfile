@@ -45,4 +45,11 @@ pipeline {
                             docker pull willbla/train-schedule:${env.BUILD_NUMBER} &&
                             (docker stop train-schedule || true) &&
                             (docker rm train-schedule || true) &&
-                            docker run --restart always --name train-schedule -p 8080:808
+                            docker run --restart always --name train-schedule -p 8080:8080 -d willbla/train-schedule:${env.BUILD_NUMBER}"
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
