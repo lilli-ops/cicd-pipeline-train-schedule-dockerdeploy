@@ -116,9 +116,9 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
-                        sh 'docker tag $IMAGE_NAME willbla/train-schedule:${env.BUILD_NUMBER}'
-                        sh 'docker push willbla/train-schedule:${env.BUILD_NUMBER}'
-                        sh 'docker push willbla/train-schedule:latest'
+                        sh 'docker tag $IMAGE_NAME lilli-ops/train-schedule:${env.BUILD_NUMBER}'
+                        sh 'docker push lilli-ops/train-schedule:${env.BUILD_NUMBER}'
+                        sh 'docker push lilli-ops/train-schedule:latest'
                     }
                 }
             }
@@ -133,7 +133,7 @@ pipeline {
                 milestone(1)
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull willbla/train-schedule:${env.BUILD_NUMBER}\""
+                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull lilli-ops/train-schedule:${env.BUILD_NUMBER}\""
                         try {
                             sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop train-schedule\""
                             sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm train-schedule\""
